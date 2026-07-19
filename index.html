@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#001e3c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="description" content="Apnea Command Center - Train your breath-hold for freediving">
+
+    <title>Apnea Command Center</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    <link rel="icon" type="image/png" href="icon-32x32.png">
+    <link rel="shortcut icon" href="favicon.ico">
+
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --abyss: #000814;
+            --deep-ocean: #001d3d;
+            --mid-ocean: #003566;
+            --shallow: #0077b6;
+            --surface: #00b4d8;
+            --foam: #90e0ef;
+            --bubble: #caf0f8;
+            --coral: #ff6b6b;
+            --neon-cyan: #00f5ff;
+            --neon-pink: #ff007f;
+            --neon-green: #39ff14;
+            --danger: #ff3333;
+            --warning: #ffd60a;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            background: var(--abyss);
+            color: #e0f7fa;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* ===== UNDERWATER BACKGROUND ===== */
+        .ocean-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background: linear-gradient(
+                180deg,
+                #001d3d 0%,
+                #000814 30%,
+                #000814 70%,
+                #001233 100%
+            );
+        }
+
+        /* Caustic light rays */
+        .caustics {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            opacity: 0.08;
+            background: 
+                repeating-conic-gradient(
+                    from 0deg at 50% 0%,
+                    transparent 0deg,
+                    rgba(0, 180, 216, 0.3) 5deg,
+                    transparent 10deg
+                );
+            animation: caustic-shift 8s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes caustic-shift {
+            0% { transform: scale(1.2) rotate(-2deg); opacity: 0.06; }
+            100% { transform: scale(1.3) rotate(2deg); opacity: 0.1; }
+        }
+
+        /* Floating particles / plankton */
+        .particles {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(144, 224, 239, 0.4);
+            border-radius: 50%;
+            animation: float-up linear infinite;
+        }
+
+        @keyframes float-up {
+            0% { transform: translateY(100vh) translateX(0); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
+        }
+
+        /* Bubbles */
+        .bubbles-container {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            bottom: -20px;
+            background: radial-gradient(circle at 30% 30%, rgba(202, 240, 248, 0.3), rgba(202, 240, 248, 0.05));
+            border: 1px solid rgba(202, 240, 248, 0.15);
+            border-radius: 50%;
+            animation: rise linear infinite;
+        }
+
+        @keyframes rise {
+            0% { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+            5% { opacity: 0.6; }
+            50% { transform: translateY(-50vh) translateX(15px) scale(1.1); }
+            95% { opacity: 0.3; }
+            100% { transform: translateY(-110vh) translateX(-10px) scale(0.8); opacity: 0; }
+        }
+
+        /* ===== GLASS PANELS ===== */
+        .glass {
+            background: rgba(0, 29, 61, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 180, 216, 0.12);
+            border-radius: 20px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .glass-strong {
+            background: rgba(0, 29, 61, 0.65);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+        }
+
+        /* ===== TYPOGRAPHY ===== */
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        .glow-cyan { text-shadow: 0 0 20px rgba(0, 245, 255, 0.5), 0 0 40px rgba(0, 245, 255, 0.2); }
+        .glow-pink { text-shadow: 0 0 20px rgba(255, 0, 127, 0.5); }
+        .glow-green { text-shadow: 0 0 20px rgba(57, 255, 20, 0.5); }
+
+        /* ===== LAYOUT ===== */
+        .app-container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0 24px;
+            border-bottom: 1px solid rgba(0, 180, 216, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--surface), var(--mid-ocean));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.15);
+        }
+
+        .logo-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--neon-cyan);
+            filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.6));
+        }
+
+        .logo-text h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            color: #fff;
+        }
+
+        .logo-text h1 span {
+            font-weight: 300;
+            color: var(--surface);
+        }
+
+        .logo-text p {
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
+            color: rgba(144, 224, 239, 0.5);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* Readiness Pills */
+        .readiness-group {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .readiness-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(144, 224, 239, 0.5);
+        }
+
+        .readiness-pills {
+            display: flex;
+            gap: 6px;
+        }
+
+        .pill {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            background: rgba(0, 29, 61, 0.5);
+            color: rgba(144, 224, 239, 0.4);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pill:hover {
+            border-color: rgba(0, 180, 216, 0.5);
+            color: var(--foam);
+            transform: translateY(-2px);
+        }
+
+        .pill.active-1 { background: rgba(255, 51, 51, 0.2); border-color: var(--danger); color: var(--danger); box-shadow: 0 0 12px rgba(255, 51, 51, 0.3); }
+        .pill.active-2 { background: rgba(255, 214, 10, 0.15); border-color: var(--warning); color: var(--warning); }
+        .pill.active-3 { background: rgba(0, 180, 216, 0.15); border-color: var(--surface); color: var(--surface); }
+        .pill.active-4 { background: rgba(57, 255, 20, 0.15); border-color: var(--neon-green); color: var(--neon-green); }
+        .pill.active-5 { background: rgba(0, 245, 255, 0.2); border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 245, 255, 0.3); }
+
+        /* ===== TIMER SECTION ===== */
+        .timer-section {
+            padding: 40px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-section::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(0, 245, 255, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stat-box {
+            text-align: left;
+        }
+
+        .stat-box.right { text-align: right; }
+
+        .stat-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: rgba(144, 224, 239, 0.4);
+            margin-bottom: 4px;
+        }
+
+        .stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--foam);
+        }
+
+        .stat-value.pr { color: var(--neon-cyan); }
+
+        /* Timer Display */
+        .timer-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: clamp(4rem, 15vw, 7rem);
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            margin: 24px 0;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .timer-display.idle { color: rgba(224, 247, 250, 0.3); }
+        .timer-display.active { color: var(--neon-cyan); text-shadow: 0 0 30px rgba(0, 245, 255, 0.4), 0 0 60px rgba(0, 245, 255, 0.1); }
+        .timer-display.danger { color: var(--danger); text-shadow: 0 0 30px rgba(255, 51, 51, 0.5); animation: pulse-red 1s ease-in-out infinite; }
+        .timer-display.success { color: var(--neon-green); text-shadow: 0 0 30px rgba(57, 255, 20, 0.4); }
+
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .timer-status {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: rgba(144, 224, 239, 0.4);
+            margin-bottom: 32px;
+            min-height: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .timer-status.active { color: var(--neon-cyan); }
+        .timer-status.danger { color: var(--danger); }
+        .timer-status.success { color: var(--neon-green); }
+
+        /* Timer Controls */
+        .timer-controls {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn {
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn:active { transform: scale(0.96); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--surface), var(--mid-ocean));
+            color: #fff;
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 180, 216, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-primary:hover {
+            box-shadow: 0 4px 30px rgba(0, 180, 216, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 29, 61, 0.6);
+            color: rgba(224, 247, 250, 0.7);
+            border: 1px solid rgba(0, 180, 216, 0.15);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 29, 61, 0.8);
+            border-color: rgba(0, 180, 216, 0.3);
+            color: #fff;
+        }
+
+        /* ===== BREATHING GUIDE ===== */
+        .breathing-section {
+            padding: 24px;
+            margin-top: 16px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .section-subtitle {
+            font-size: 0.75rem;
+            color: rgba(144, 224, 239, 0.4);
+            margin-top: 2px;
+        }
+
+        .breathing-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+        }
+
+        .breath-circle-wrap {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .breath-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 245, 255, 0.1);
+        }
+
+        .breath-ring-2 {
+            position: absolute;
+            inset: 10px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 245, 255, 0.05);
+        }
+
+        .breath-core {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, rgba(0, 245, 255, 0.4), rgba(0, 119, 182, 0.2));
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 245, 255, 0.2);
+            transition: all 4s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .breath-core.inhale {
+            transform: scale(1.6);
+            box-shadow: 0 0 50px rgba(0, 245, 255, 0.4);
+            background: radial-gradient(circle at 35% 35%, rgba(0, 245, 255, 0.6), rgba(0, 119, 182, 0.3));
+        }
+
+        .breath-core.hold {
+            transform: scale(1.6);
+            box-shadow: 0 0 60px rgba(0, 245, 255, 0.5);
+        }
+
+        .breath-core.exhale {
+            transform: scale(1);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.1);
+            background: radial-gradient(circle at 35% 35%, rgba(0, 245, 255, 0.2), rgba(0, 119, 182, 0.1));
+        }
+
+        .breath-label {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .breath-info {
+            flex: 1;
+        }
+
+        .breath-info p {
+            font-size: 0.875rem;
+            color: rgba(224, 247, 250, 0.6);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .breath-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 12px;
+            background: rgba(0, 180, 216, 0.1);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            color: var(--surface);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .breath-btn:hover {
+            background: rgba(0, 180, 216, 0.2);
+            border-color: rgba(0, 180, 216, 0.4);
+        }
+
+        .breath-btn.active {
+            background: rgba(0, 245, 255, 0.15);
+            border-color: var(--neon-cyan);
+            color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.15);
+        }
+
+        /* ===== CHART SECTION ===== */
+        .chart-section {
+            padding: 24px;
+            margin-top: 16px;
+        }
+
+        .chart-container {
+            height: 200px;
+            margin-top: 16px;
+        }
+
+        /* ===== CO2 TABLE ===== */
+        .co2-section {
+            padding: 24px;
+            margin-top: 16px;
+        }
+
+        .co2-placeholder {
+            text-align: center;
+            padding: 40px 20px;
+            border: 2px dashed rgba(0, 180, 216, 0.1);
+            border-radius: 16px;
+            color: rgba(144, 224, 239, 0.3);
+            font-size: 0.875rem;
+        }
+
+        .co2-table-wrap {
+            overflow-x: auto;
+            margin-top: 16px;
+        }
+
+        .co2-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.875rem;
+        }
+
+        .co2-table th {
+            text-align: left;
+            padding: 12px 16px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(144, 224, 239, 0.4);
+            border-bottom: 1px solid rgba(0, 180, 216, 0.1);
+        }
+
+        .co2-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(0, 180, 216, 0.05);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .co2-table tr:hover td {
+            background: rgba(0, 180, 216, 0.03);
+        }
+
+        .round-num {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .time-rest { color: var(--coral); }
+        .time-hold { color: var(--neon-cyan); }
+
+        /* ===== ARCADE ===== */
+        .arcade-section {
+            padding: 24px;
+            margin-top: 16px;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .arcade-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(255, 0, 127, 0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .arcade-card {
+            background: linear-gradient(135deg, rgba(255, 0, 127, 0.08), rgba(0, 29, 61, 0.4));
+            border: 1px solid rgba(255, 0, 127, 0.2);
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 16px;
+            animation: card-in 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes card-in {
+            from { opacity: 0; transform: translateY(20px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .arcade-tag {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: rgba(255, 0, 127, 0.15);
+            border: 1px solid rgba(255, 0, 127, 0.2);
+            color: var(--neon-pink);
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
+        .arcade-title {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .arcade-desc {
+            font-size: 0.875rem;
+            color: rgba(224, 247, 250, 0.7);
+            line-height: 1.6;
+        }
+
+        .btn-arcade {
+            background: linear-gradient(135deg, rgba(255, 0, 127, 0.15), rgba(255, 0, 127, 0.05));
+            color: var(--neon-pink);
+            border: 1px solid rgba(255, 0, 127, 0.3);
+            box-shadow: 0 4px 20px rgba(255, 0, 127, 0.1);
+        }
+
+        .btn-arcade:hover {
+            box-shadow: 0 4px 30px rgba(255, 0, 127, 0.25);
+            border-color: rgba(255, 0, 127, 0.5);
+        }
+
+        /* ===== INSTALL PROMPT ===== */
+        .install-prompt {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--glass-strong);
+            backdrop-filter: blur(20px);
+            padding: 16px 24px;
+            border-radius: 16px;
+            border: 1px solid rgba(0, 245, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 100;
+        }
+
+        .install-prompt.show { transform: translateX(-50%) translateY(0); }
+
+        .install-prompt p {
+            font-size: 0.875rem;
+            color: #fff;
+        }
+
+        .install-prompt button {
+            padding: 8px 16px;
+            border-radius: 10px;
+            background: var(--neon-cyan);
+            color: var(--abyss);
+            border: none;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .install-close {
+            background: none !important;
+            color: rgba(255, 255, 255, 0.5) !important;
+            font-size: 1.2rem !important;
+            padding: 4px !important;
+        }
+
+        /* ===== CONFETTI ===== */
+        .confetti-piece {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            pointer-events: none;
+            z-index: 999;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 640px) {
+            .timer-controls { grid-template-columns: 1fr; }
+            .stats-row { gap: 16px; }
+            .stat-value { font-size: 1.25rem; }
+            .breathing-visual { flex-direction: column; text-align: center; }
+        }
+
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: var(--abyss); }
+        ::-webkit-scrollbar-thumb { background: var(--mid-ocean); border-radius: 3px; }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="ocean-bg"></div>
+    <div class="caustics"></div>
+    <div class="particles" id="particles"></div>
+    <div class="bubbles-container" id="bubbles"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <h1>APNEA <span>COMMAND</span></h1>
+                    <p>Deep Dive OS v3.0</p>
+                </div>
+            </div>
+            <div class="readiness-group">
+                <span class="readiness-label">CNS Readiness</span>
+                <div class="readiness-pills" id="score-container"></div>
+            </div>
+        </header>
+
+        <!-- Timer -->
+        <section class="glass timer-section">
+            <div class="stats-row">
+                <div class="stat-box">
+                    <div class="stat-label">All-Time PR</div>
+                    <div class="stat-value pr font-mono" id="pr-display">00:00</div>
+                </div>
+                <div class="stat-box right">
+                    <div class="stat-label">Session Best</div>
+                    <div class="stat-value font-mono" id="session-best">00:00</div>
+                </div>
+            </div>
+
+            <div class="timer-display idle font-mono" id="timer-display">00:00.0</div>
+            <div class="timer-status" id="timer-status">System Ready — Surface</div>
+
+            <div class="timer-controls">
+                <button class="btn btn-primary" id="btn-start" onclick="startTimer()">Start Hold</button>
+                <button class="btn btn-secondary" onclick="stopTimer()">Stop</button>
+                <button class="btn btn-secondary" onclick="resetTimer()">Reset</button>
+            </div>
+        </section>
+
+        <!-- Breathing Guide -->
+        <section class="glass breathing-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title">Pre-Dive Breathing</div>
+                    <div class="section-subtitle">Sync with the current</div>
+                </div>
+            </div>
+            <div class="breathing-visual">
+                <div class="breath-circle-wrap">
+                    <div class="breath-ring"></div>
+                    <div class="breath-ring-2"></div>
+                    <div class="breath-core" id="breath-core">
+                        <span class="breath-label" id="breath-label">IDLE</span>
+                    </div>
+                </div>
+                <div class="breath-info">
+                    <p>Follow the rhythm to lower your heart rate and maximize oxygen saturation before the dive.</p>
+                    <button class="breath-btn" id="breath-btn" onclick="toggleBreathing()">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Start Guide
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chart -->
+        <section class="glass chart-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title">Depth Log</div>
+                    <div class="section-subtitle">Last 10 dives</div>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </section>
+
+        <!-- CO2 Table -->
+        <section class="glass co2-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title">CO2 Training Tables</div>
+                    <div class="section-subtitle">Auto-generated from your PR</div>
+                </div>
+                <button class="btn btn-secondary" style="padding: 10px 18px; font-size: 0.75rem;" onclick="generateCO2Table()">Generate</button>
+            </div>
+            <div id="co2-placeholder" class="co2-placeholder">
+                Log a PR of at least 30s to unlock training tables
+            </div>
+            <div id="co2-table-wrap" class="co2-table-wrap" style="display: none;">
+                <table class="co2-table">
+                    <thead>
+                        <tr>
+                            <th>Round</th>
+                            <th>Ventilation (Rest)</th>
+                            <th>Apnea (Hold)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="co2-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Arcade -->
+        <section class="glass arcade-section">
+            <div class="section-header">
+                <div>
+                    <div class="section-title" style="color: var(--neon-pink);">Apnea Arcade</div>
+                    <div class="section-subtitle">Dryland challenges</div>
+                </div>
+                <button class="btn btn-arcade" style="padding: 10px 18px; font-size: 0.75rem;" onclick="generateChallenge()">Draw Card</button>
+            </div>
+            <div id="arcade-placeholder" class="co2-placeholder" style="border-color: rgba(255, 0, 127, 0.1);">
+                Draw a challenge to test your limits
+            </div>
+            <div id="arcade-card" style="display: none;"></div>
+        </section>
+    </div>
+
+    <!-- Install Prompt -->
+    <div class="install-prompt" id="install-prompt">
+        <p>Install Apnea Command Center</p>
+        <button onclick="installApp()">Install</button>
+        <button class="install-close" onclick="dismissInstall()">&times;</button>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+        // ===== STATE =====
+        let seconds = 0;
+        let timerInterval = null;
+        let personalRecord = parseInt(localStorage.getItem('apneaPR')) || 0;
+        let sessionHistory = JSON.parse(localStorage.getItem('apneaHistory')) || [];
+        let isBreathing = false;
+        let breathTimeout = null;
+        let deferredPrompt = null;
+        let chartInstance = null;
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            initBackgroundEffects();
+            initReadiness();
+            updateDisplay();
+            document.getElementById('pr-display').textContent = formatTime(personalRecord);
+            updateSessionStats();
+            initChart();
+            initServiceWorker();
+        });
+
+        // ===== BACKGROUND EFFECTS =====
+        function initBackgroundEffects() {
+            // Particles
+            const particleContainer = document.getElementById('particles');
+            for (let i = 0; i < 30; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.animationDuration = (8 + Math.random() * 12) + 's';
+                p.style.animationDelay = Math.random() * 10 + 's';
+                p.style.width = (1 + Math.random() * 2) + 'px';
+                p.style.height = p.style.width;
+                particleContainer.appendChild(p);
+            }
+
+            // Bubbles
+            const bubbleContainer = document.getElementById('bubbles');
+            for (let i = 0; i < 15; i++) {
+                const b = document.createElement('div');
+                b.className = 'bubble';
+                const size = 8 + Math.random() * 24;
+                b.style.width = size + 'px';
+                b.style.height = size + 'px';
+                b.style.left = Math.random() * 100 + '%';
+                b.style.animationDuration = (6 + Math.random() * 10) + 's';
+                b.style.animationDelay = Math.random() * 8 + 's';
+                bubbleContainer.appendChild(b);
+            }
+        }
+
+        // ===== FORMATTING =====
+        function formatTime(totalSeconds) {
+            const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const s = (totalSeconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        function formatTimePrecise(totalSeconds) {
+            const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+            const s = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+            const ms = Math.floor((totalSeconds % 1) * 10);
+            return `${m}:${s}.${ms}`;
+        }
+
+        // ===== TIMER =====
+        function startTimer() {
+            if (timerInterval) return;
+
+            const display = document.getElementById('timer-display');
+            const status = document.getElementById('timer-status');
+            const btnStart = document.getElementById('btn-start');
+
+            display.classList.remove('idle', 'success');
+            display.classList.add('active');
+            status.textContent = 'DESCENDING — HOLD ACTIVE';
+            status.classList.add('active');
+            btnStart.textContent = 'Holding...';
+            btnStart.classList.add('opacity-60');
+
+            if (isBreathing) toggleBreathing();
+
+            const startTime = Date.now() - (seconds * 1000);
+            timerInterval = setInterval(() => {
+                seconds = (Date.now() - startTime) / 1000;
+                updateDisplay();
+                checkDepthZones();
+            }, 100);
+        }
+
+        function stopTimer() {
+            if (!timerInterval) return;
+            clearInterval(timerInterval);
+            timerInterval = null;
+
+            const display = document.getElementById('timer-display');
+            const status = document.getElementById('timer-status');
+            const btnStart = document.getElementById('btn-start');
+
+            display.classList.remove('active', 'danger');
+            display.classList.add('success');
+            status.textContent = 'SURFACED — HOLD COMPLETE';
+            status.classList.remove('active', 'danger');
+            status.classList.add('success');
+            btnStart.textContent = 'Start Hold';
+            btnStart.classList.remove('opacity-60');
+            document.body.classList.remove('animate-shake');
+
+            const finalTime = Math.floor(seconds);
+            if (finalTime > personalRecord) {
+                personalRecord = finalTime;
+                localStorage.setItem('apneaPR', personalRecord);
+                document.getElementById('pr-display').textContent = formatTime(personalRecord);
+                status.textContent = 'NEW PERSONAL RECORD!';
+                status.style.color = 'var(--neon-green)';
+                triggerConfetti();
+            }
+
+            addToHistory(finalTime);
+        }
+
+        function resetTimer() {
+            stopTimer();
+            seconds = 0;
+            updateDisplay();
+            const display = document.getElementById('timer-display');
+            const status = document.getElementById('timer-status');
+            display.classList.remove('success', 'danger');
+            display.classList.add('idle');
+            status.textContent = 'System Ready — Surface';
+            status.classList.remove('success', 'danger', 'active');
+            status.style.color = '';
+        }
+
+        function updateDisplay() {
+            document.getElementById('timer-display').textContent = formatTimePrecise(seconds);
+        }
+
+        function checkDepthZones() {
+            const status = document.getElementById('timer-status');
+            const display = document.getElementById('timer-display');
+
+            if (personalRecord > 0) {
+                const ratio = seconds / personalRecord;
+                if (ratio > 0.85) {
+                    display.classList.remove('active');
+                    display.classList.add('danger');
+                    status.textContent = 'CRITICAL DEPTH — CONTRACTIONS';
+                    status.classList.remove('active');
+                    status.classList.add('danger');
+                } else if (ratio > 0.6) {
+                    status.textContent = 'DEEP WATER — STAY CALM';
+                }
+            }
+        }
+
+        // ===== HISTORY =====
+        function addToHistory(time) {
+            sessionHistory.unshift({ date: new Date().toISOString(), duration: time });
+            if (sessionHistory.length > 20) sessionHistory.pop();
+            localStorage.setItem('apneaHistory', JSON.stringify(sessionHistory));
+            updateSessionStats();
+            updateChart();
+        }
+
+        function updateSessionStats() {
+            if (sessionHistory.length === 0) return;
+            const best = Math.max(...sessionHistory.map(h => h.duration));
+            document.getElementById('session-best').textContent = formatTime(best);
+        }
+
+        // ===== CHART =====
+        function initChart() {
+            const ctx = document.getElementById('progressChart').getContext('2d');
+            const data = getChartData();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 8, 20, 0.9)',
+                            titleColor: 'rgba(144, 224, 239, 0.6)',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(0, 245, 255, 0.2)',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                title: () => '',
+                                label: (ctx) => `${ctx.parsed.y}s hold`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { display: false },
+                        y: {
+                            display: true,
+                            grid: { color: 'rgba(0, 180, 216, 0.05)' },
+                            ticks: {
+                                color: 'rgba(144, 224, 239, 0.3)',
+                                font: { family: 'JetBrains Mono', size: 10 },
+                                callback: (v) => v + 's'
+                            },
+                            border: { display: false }
+                        }
+                    },
+                    elements: {
+                        line: { tension: 0.4, borderWidth: 2 },
+                        point: { radius: 0, hitRadius: 15, hoverRadius: 5, backgroundColor: '#00f5ff' }
+                    },
+                    interaction: { intersect: false, mode: 'index' }
+                }
+            });
+        }
+
+        function getChartData() {
+            const points = sessionHistory.slice(0, 10).reverse().map(h => h.duration);
+            const labels = points.map((_, i) => `Dive ${i + 1}`);
+            return {
+                labels,
+                datasets: [{
+                    label: 'Hold Time',
+                    data: points,
+                    borderColor: '#00f5ff',
+                    backgroundColor: (ctx) => {
+                        const c = ctx.chart.ctx;
+                        const g = c.createLinearGradient(0, 0, 0, 200);
+                        g.addColorStop(0, 'rgba(0, 245, 255, 0.2)');
+                        g.addColorStop(1, 'rgba(0, 245, 255, 0)');
+                        return g;
+                    },
+                    fill: true
+                }]
+            };
+        }
+
+        function updateChart() {
+            if (chartInstance) {
+                chartInstance.data = getChartData();
+                chartInstance.update('none');
+            }
+        }
+
+        // ===== BREATHING =====
+        function toggleBreathing() {
+            const core = document.getElementById('breath-core');
+            const label = document.getElementById('breath-label');
+            const btn = document.getElementById('breath-btn');
+
+            if (isBreathing) {
+                isBreathing = false;
+                clearTimeout(breathTimeout);
+                core.className = 'breath-core';
+                label.textContent = 'IDLE';
+                btn.classList.remove('active');
+                btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Start Guide`;
+                return;
+            }
+
+            isBreathing = true;
+            btn.classList.add('active');
+            btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> Stop`;
+
+            const cycle = () => {
+                if (!isBreathing) return;
+                label.textContent = 'INHALE';
+                core.className = 'breath-core inhale';
+
+                breathTimeout = setTimeout(() => {
+                    if (!isBreathing) return;
+                    label.textContent = 'HOLD';
+                    core.className = 'breath-core hold';
+
+                    breathTimeout = setTimeout(() => {
+                        if (!isBreathing) return;
+                        label.textContent = 'EXHALE';
+                        core.className = 'breath-core exhale';
+
+                        breathTimeout = setTimeout(() => {
+                            if (!isBreathing) return;
+                            cycle();
+                        }, 4000);
+                    }, 2000);
+                }, 4000);
+            };
+            cycle();
+        }
+
+        // ===== READINESS =====
+        function initReadiness() {
+            const container = document.getElementById('score-container');
+            const saved = JSON.parse(localStorage.getItem('apneaReadiness'));
+            const today = new Date().toDateString();
+            const active = (saved && saved.date === today) ? saved.score : 0;
+
+            for (let i = 1; i <= 5; i++) {
+                const btn = document.createElement('button');
+                btn.className = `pill ${i === active ? 'active-' + i : ''}`;
+                btn.textContent = i;
+                btn.onclick = () => setReadiness(i);
+                container.appendChild(btn);
+            }
+        }
+
+        function setReadiness(score) {
+            localStorage.setItem('apneaReadiness', JSON.stringify({ score, date: new Date().toDateString() }));
+            const pills = document.querySelectorAll('.pill');
+            pills.forEach((p, i) => {
+                p.className = 'pill' + (i + 1 === score ? ' active-' + score : '');
+            });
+        }
+
+        // ===== CO2 TABLE =====
+        function generateCO2Table() {
+            if (personalRecord < 30) {
+                alert('Log a PR of at least 30 seconds first.');
+                return;
+            }
+
+            document.getElementById('co2-placeholder').style.display = 'none';
+            document.getElementById('co2-table-wrap').style.display = 'block';
+
+            const tbody = document.getElementById('co2-table-body');
+            tbody.innerHTML = '';
+
+            const holdTime = Math.floor(personalRecord * 0.5);
+            let initialRest = 120;
+            const decayRate = 0.15;
+            const rounds = 6;
+
+            for (let n = 0; n < rounds; n++) {
+                const rest = Math.floor(initialRest * Math.pow(1 - decayRate, n));
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><span class="round-num">#${n + 1}</span></td>
+                    <td class="time-rest">${formatTime(rest)}</td>
+                    <td class="time-hold">${formatTime(holdTime)}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        // ===== ARCADE =====
+        const challenges = [
+            { title: 'Oxygen Debt Push-ups', desc: 'Perform a sub-maximal set of push-ups. On the last rep, exhale 50% and hold your breath for 30 seconds.' },
+            { title: 'The Isometric Vice', desc: 'Take a peak inhalation. Squeeze your hand gripper shut and hold it closed for the entire duration of a 45-second breath hold.' },
+            { title: 'Fingertip Plank', desc: 'Drop into a fingertip plank. Exhale completely, and hold your breath on empty lungs for 15-20 seconds.' },
+            { title: 'Rep & Hold Protocol', desc: 'Do 5 push-ups, hold your breath at the top for 10 seconds. Do 5 more, hold for 10s. Repeat until failure.' },
+            { title: 'Grip Sprints', desc: 'Hold your breath. Perform rapid, explosive repetitions with your hand gripper until muscle failure.' }
+        ];
+
+        function generateChallenge() {
+            const card = document.getElementById('arcade-card');
+            const placeholder = document.getElementById('arcade-placeholder');
+            const c = challenges[Math.floor(Math.random() * challenges.length)];
+
+            placeholder.style.display = 'none';
+            card.style.display = 'block';
+            card.className = 'arcade-card';
+
+            // Trigger reflow for animation
+            void card.offsetWidth;
+
+            card.innerHTML = `
+                <div class="arcade-tag">Dryland Challenge</div>
+                <div class="arcade-title">${c.title}</div>
+                <div class="arcade-desc">${c.desc}</div>
+            `;
+        }
+
+        // ===== CONFETTI =====
+        function triggerConfetti() {
+            const colors = ['#00f5ff', '#ff007f', '#39ff14', '#ffd60a'];
+            for (let i = 0; i < 60; i++) {
+                const el = document.createElement('div');
+                el.className = 'confetti-piece';
+                el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                el.style.left = '50%';
+                el.style.top = '40%';
+                document.body.appendChild(el);
+
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 5 + Math.random() * 15;
+                const tx = Math.cos(angle) * velocity * 15;
+                const ty = Math.sin(angle) * velocity * 15;
+                const rot = Math.random() * 720;
+
+                el.animate([
+                    { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1 },
+                    { transform: `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(0)`, opacity: 0 }
+                ], { duration: 1200, easing: 'cubic-bezier(0, .9, .57, 1)' }).onfinish = () => el.remove();
+            }
+        }
+
+        // ===== PWA =====
+        function initServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW registered'))
+                    .catch(err => console.log('SW error', err));
+            }
+
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                setTimeout(() => {
+                    document.getElementById('install-prompt').classList.add('show');
+                }, 2000);
+            });
+        }
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(() => {
+                    deferredPrompt = null;
+                    document.getElementById('install-prompt').classList.remove('show');
+                });
+            }
+        }
+
+        function dismissInstall() {
+            document.getElementById('install-prompt').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

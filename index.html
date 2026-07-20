@@ -10,10 +10,10 @@
 
     <title>Apnea Command Center</title>
 
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192x192.png">
-    <link rel="icon" type="image/png" href="icon-32x32.png">
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="manifest" href="./manifest.json">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="./icon-32x32.png">
+    <link rel="shortcut icon" href="./favicon.ico">
 
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
 
@@ -30,6 +30,7 @@
             --neon-cyan: #00f5ff;
             --neon-pink: #ff007f;
             --neon-green: #39ff14;
+            --neon-amber: #ffb703;
             --danger: #ff3333;
             --warning: #ffd60a;
         }
@@ -45,33 +46,19 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* ===== UNDERWATER BACKGROUND ===== */
         .ocean-bg {
             position: fixed;
             inset: 0;
             z-index: -2;
-            background: linear-gradient(
-                180deg,
-                #001d3d 0%,
-                #000814 30%,
-                #000814 70%,
-                #001233 100%
-            );
+            background: linear-gradient(180deg, #001d3d 0%, #000814 30%, #000814 70%, #001233 100%);
         }
 
-        /* Caustic light rays */
         .caustics {
             position: fixed;
             inset: 0;
             z-index: -1;
             opacity: 0.08;
-            background: 
-                repeating-conic-gradient(
-                    from 0deg at 50% 0%,
-                    transparent 0deg,
-                    rgba(0, 180, 216, 0.3) 5deg,
-                    transparent 10deg
-                );
+            background: repeating-conic-gradient(from 0deg at 50% 0%, transparent 0deg, rgba(0, 180, 216, 0.3) 5deg, transparent 10deg);
             animation: caustic-shift 8s ease-in-out infinite alternate;
             pointer-events: none;
         }
@@ -81,7 +68,6 @@
             100% { transform: scale(1.3) rotate(2deg); opacity: 0.1; }
         }
 
-        /* Floating particles / plankton */
         .particles {
             position: fixed;
             inset: 0;
@@ -106,7 +92,6 @@
             100% { transform: translateY(-10vh) translateX(20px); opacity: 0; }
         }
 
-        /* Bubbles */
         .bubbles-container {
             position: fixed;
             inset: 0;
@@ -132,16 +117,13 @@
             100% { transform: translateY(-110vh) translateX(-10px) scale(0.8); opacity: 0; }
         }
 
-        /* ===== GLASS PANELS ===== */
         .glass {
             background: rgba(0, 29, 61, 0.45);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(0, 180, 216, 0.12);
             border-radius: 20px;
-            box-shadow: 
-                0 8px 32px rgba(0, 0, 0, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
         }
 
         .glass-strong {
@@ -149,14 +131,8 @@
             border: 1px solid rgba(0, 180, 216, 0.2);
         }
 
-        /* ===== TYPOGRAPHY ===== */
         .font-mono { font-family: 'JetBrains Mono', monospace; }
 
-        .glow-cyan { text-shadow: 0 0 20px rgba(0, 245, 255, 0.5), 0 0 40px rgba(0, 245, 255, 0.2); }
-        .glow-pink { text-shadow: 0 0 20px rgba(255, 0, 127, 0.5); }
-        .glow-green { text-shadow: 0 0 20px rgba(57, 255, 20, 0.5); }
-
-        /* ===== LAYOUT ===== */
         .app-container {
             max-width: 900px;
             margin: 0 auto;
@@ -166,7 +142,6 @@
             flex-direction: column;
         }
 
-        /* ===== HEADER ===== */
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -221,7 +196,48 @@
             text-transform: uppercase;
         }
 
-        /* Readiness Pills */
+        /* ===== NAV TABS ===== */
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 4px;
+            background: rgba(0, 29, 61, 0.5);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 180, 216, 0.1);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px 8px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: rgba(144, 224, 239, 0.5);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.2), rgba(0, 119, 182, 0.1));
+            color: var(--neon-cyan);
+            box-shadow: 0 2px 12px rgba(0, 245, 255, 0.1);
+        }
+
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== READINESS ===== */
         .readiness-group {
             display: flex;
             flex-direction: column;
@@ -269,7 +285,7 @@
         .pill.active-4 { background: rgba(57, 255, 20, 0.15); border-color: var(--neon-green); color: var(--neon-green); }
         .pill.active-5 { background: rgba(0, 245, 255, 0.2); border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 245, 255, 0.3); }
 
-        /* ===== TIMER SECTION ===== */
+        /* ===== TIMER ===== */
         .timer-section {
             padding: 40px 24px;
             text-align: center;
@@ -297,10 +313,7 @@
             z-index: 1;
         }
 
-        .stat-box {
-            text-align: left;
-        }
-
+        .stat-box { text-align: left; }
         .stat-box.right { text-align: right; }
 
         .stat-label {
@@ -320,7 +333,6 @@
 
         .stat-value.pr { color: var(--neon-cyan); }
 
-        /* Timer Display */
         .timer-display {
             font-family: 'JetBrains Mono', monospace;
             font-size: clamp(4rem, 15vw, 7rem);
@@ -357,7 +369,6 @@
         .timer-status.danger { color: var(--danger); }
         .timer-status.success { color: var(--neon-green); }
 
-        /* Timer Controls */
         .timer-controls {
             display: grid;
             grid-template-columns: 2fr 1fr 1fr;
@@ -405,7 +416,320 @@
             color: #fff;
         }
 
-        /* ===== BREATHING GUIDE ===== */
+        /* ===== TRAINING MODE ===== */
+        .training-header {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .training-header h2 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 6px;
+        }
+
+        .training-header p {
+            font-size: 0.875rem;
+            color: rgba(144, 224, 239, 0.5);
+        }
+
+        /* Level Selector */
+        .level-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 4px;
+            background: rgba(0, 29, 61, 0.4);
+            border-radius: 16px;
+            border: 1px solid rgba(0, 180, 216, 0.1);
+        }
+
+        .level-btn {
+            flex: 1;
+            padding: 14px 8px;
+            border-radius: 12px;
+            border: none;
+            background: transparent;
+            color: rgba(144, 224, 239, 0.5);
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            position: relative;
+        }
+
+        .level-btn .level-tag {
+            display: block;
+            font-size: 0.6rem;
+            opacity: 0.6;
+            margin-top: 2px;
+            font-weight: 400;
+        }
+
+        .level-btn.active {
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.2), rgba(0, 119, 182, 0.1));
+            color: var(--neon-cyan);
+            box-shadow: 0 2px 12px rgba(0, 245, 255, 0.1);
+        }
+
+        .level-btn[data-level="beginner"].active {
+            background: linear-gradient(135deg, rgba(57, 255, 20, 0.15), rgba(0, 119, 182, 0.05));
+            color: var(--neon-green);
+            border: 1px solid rgba(57, 255, 20, 0.2);
+        }
+
+        .level-btn[data-level="intermediate"].active {
+            background: linear-gradient(135deg, rgba(255, 183, 3, 0.15), rgba(0, 119, 182, 0.05));
+            color: var(--neon-amber);
+            border: 1px solid rgba(255, 183, 3, 0.2);
+        }
+
+        .level-btn[data-level="advanced"].active {
+            background: linear-gradient(135deg, rgba(255, 0, 127, 0.15), rgba(0, 119, 182, 0.05));
+            color: var(--neon-pink);
+            border: 1px solid rgba(255, 0, 127, 0.2);
+        }
+
+        /* Lesson Cards */
+        .lesson-card {
+            background: rgba(0, 29, 61, 0.4);
+            border: 1px solid rgba(0, 180, 216, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lesson-card:hover {
+            border-color: rgba(0, 180, 216, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .lesson-card.completed {
+            border-color: rgba(57, 255, 20, 0.2);
+        }
+
+        .lesson-card.completed .lesson-check {
+            color: var(--neon-green);
+        }
+
+        .lesson-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .lesson-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 10px;
+            background: rgba(0, 180, 216, 0.1);
+            border: 1px solid rgba(0, 180, 216, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            flex-shrink: 0;
+        }
+
+        .lesson-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #fff;
+            flex: 1;
+        }
+
+        .lesson-check {
+            color: rgba(144, 224, 239, 0.2);
+            font-size: 1.2rem;
+        }
+
+        .lesson-desc {
+            font-size: 0.8rem;
+            color: rgba(144, 224, 239, 0.5);
+            padding-left: 44px;
+            line-height: 1.5;
+        }
+
+        .lesson-duration {
+            font-size: 0.65rem;
+            color: rgba(144, 224, 239, 0.3);
+            padding-left: 44px;
+            margin-top: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Lesson Detail Modal */
+        .lesson-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            background: rgba(0, 8, 20, 0.9);
+            backdrop-filter: blur(20px);
+            overflow-y: auto;
+            animation: modalIn 0.3s ease;
+        }
+
+        .lesson-modal.active { display: block; }
+
+        @keyframes modalIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 24px;
+            min-height: 100vh;
+        }
+
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(0, 180, 216, 0.1);
+        }
+
+        .modal-back {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--surface);
+            font-size: 0.875rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .modal-level-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .badge-beginner { background: rgba(57, 255, 20, 0.15); color: var(--neon-green); border: 1px solid rgba(57, 255, 20, 0.2); }
+        .badge-intermediate { background: rgba(255, 183, 3, 0.15); color: var(--neon-amber); border: 1px solid rgba(255, 183, 3, 0.2); }
+        .badge-advanced { background: rgba(255, 0, 127, 0.15); color: var(--neon-pink); border: 1px solid rgba(255, 0, 127, 0.2); }
+
+        .modal-body h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 16px;
+        }
+
+        .modal-body p, .modal-body li {
+            font-size: 0.9rem;
+            color: rgba(224, 247, 250, 0.7);
+            line-height: 1.7;
+            margin-bottom: 12px;
+        }
+
+        .modal-body ul {
+            padding-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        .modal-body li {
+            margin-bottom: 8px;
+        }
+
+        .modal-body strong {
+            color: var(--foam);
+        }
+
+        .modal-body .tip-box {
+            background: rgba(0, 180, 216, 0.08);
+            border: 1px solid rgba(0, 180, 216, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .modal-body .tip-box .tip-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .modal-body .warning-box {
+            background: rgba(255, 51, 51, 0.08);
+            border: 1px solid rgba(255, 51, 51, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 20px 0;
+        }
+
+        .modal-body .warning-box .warning-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--danger);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 8px;
+        }
+
+        .practice-btn {
+            width: 100%;
+            padding: 18px;
+            border-radius: 16px;
+            border: none;
+            background: linear-gradient(135deg, var(--surface), var(--mid-ocean));
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 24px;
+            box-shadow: 0 4px 20px rgba(0, 180, 216, 0.2);
+            transition: all 0.2s ease;
+        }
+
+        .practice-btn:hover {
+            box-shadow: 0 4px 30px rgba(0, 180, 216, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 29, 61, 0.6);
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-green));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* ===== BREATHING ===== */
         .breathing-section {
             padding: 24px;
             margin-top: 16px;
@@ -537,7 +861,7 @@
             box-shadow: 0 0 20px rgba(0, 245, 255, 0.15);
         }
 
-        /* ===== CHART SECTION ===== */
+        /* ===== CHART ===== */
         .chart-section {
             padding: 24px;
             margin-top: 16px;
@@ -720,7 +1044,6 @@
             padding: 4px !important;
         }
 
-        /* ===== CONFETTI ===== */
         .confetti-piece {
             position: fixed;
             width: 8px;
@@ -729,22 +1052,23 @@
             z-index: 999;
         }
 
-        /* ===== RESPONSIVE ===== */
         @media (max-width: 640px) {
             .timer-controls { grid-template-columns: 1fr; }
             .stats-row { gap: 16px; }
             .stat-value { font-size: 1.25rem; }
             .breathing-visual { flex-direction: column; text-align: center; }
+            .nav-tabs { flex-wrap: wrap; }
+            .nav-tab { font-size: 0.7rem; padding: 10px 6px; }
+            .level-selector { flex-wrap: wrap; }
+            .level-btn { font-size: 0.7rem; }
         }
 
-        /* ===== SCROLLBAR ===== */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: var(--abyss); }
         ::-webkit-scrollbar-thumb { background: var(--mid-ocean); border-radius: 3px; }
     </style>
 </head>
 <body>
-    <!-- Background Effects -->
     <div class="ocean-bg"></div>
     <div class="caustics"></div>
     <div class="particles" id="particles"></div>
@@ -770,108 +1094,167 @@
             </div>
         </header>
 
-        <!-- Timer -->
-        <section class="glass timer-section">
-            <div class="stats-row">
-                <div class="stat-box">
-                    <div class="stat-label">All-Time PR</div>
-                    <div class="stat-value pr font-mono" id="pr-display">00:00</div>
-                </div>
-                <div class="stat-box right">
-                    <div class="stat-label">Session Best</div>
-                    <div class="stat-value font-mono" id="session-best">00:00</div>
-                </div>
-            </div>
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('timer')" data-tab="timer">Timer</button>
+            <button class="nav-tab" onclick="switchTab('training')" data-tab="training">Training</button>
+            <button class="nav-tab" onclick="switchTab('tables')" data-tab="tables">CO2 Tables</button>
+            <button class="nav-tab" onclick="switchTab('arcade')" data-tab="arcade">Arcade</button>
+        </nav>
 
-            <div class="timer-display idle font-mono" id="timer-display">00:00.0</div>
-            <div class="timer-status" id="timer-status">System Ready — Surface</div>
-
-            <div class="timer-controls">
-                <button class="btn btn-primary" id="btn-start" onclick="startTimer()">Start Hold</button>
-                <button class="btn btn-secondary" onclick="stopTimer()">Stop</button>
-                <button class="btn btn-secondary" onclick="resetTimer()">Reset</button>
-            </div>
-        </section>
-
-        <!-- Breathing Guide -->
-        <section class="glass breathing-section">
-            <div class="section-header">
-                <div>
-                    <div class="section-title">Pre-Dive Breathing</div>
-                    <div class="section-subtitle">Sync with the current</div>
-                </div>
-            </div>
-            <div class="breathing-visual">
-                <div class="breath-circle-wrap">
-                    <div class="breath-ring"></div>
-                    <div class="breath-ring-2"></div>
-                    <div class="breath-core" id="breath-core">
-                        <span class="breath-label" id="breath-label">IDLE</span>
+        <!-- TIMER TAB -->
+        <div class="tab-panel active" id="tab-timer">
+            <section class="glass timer-section">
+                <div class="stats-row">
+                    <div class="stat-box">
+                        <div class="stat-label">All-Time PR</div>
+                        <div class="stat-value pr font-mono" id="pr-display">00:00</div>
+                    </div>
+                    <div class="stat-box right">
+                        <div class="stat-label">Session Best</div>
+                        <div class="stat-value font-mono" id="session-best">00:00</div>
                     </div>
                 </div>
-                <div class="breath-info">
-                    <p>Follow the rhythm to lower your heart rate and maximize oxygen saturation before the dive.</p>
-                    <button class="breath-btn" id="breath-btn" onclick="toggleBreathing()">
-                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        Start Guide
-                    </button>
-                </div>
-            </div>
-        </section>
 
-        <!-- Chart -->
-        <section class="glass chart-section">
-            <div class="section-header">
-                <div>
-                    <div class="section-title">Depth Log</div>
-                    <div class="section-subtitle">Last 10 dives</div>
-                </div>
-            </div>
-            <div class="chart-container">
-                <canvas id="progressChart"></canvas>
-            </div>
-        </section>
+                <div class="timer-display idle font-mono" id="timer-display">00:00.0</div>
+                <div class="timer-status" id="timer-status">System Ready — Surface</div>
 
-        <!-- CO2 Table -->
-        <section class="glass co2-section">
-            <div class="section-header">
-                <div>
-                    <div class="section-title">CO2 Training Tables</div>
-                    <div class="section-subtitle">Auto-generated from your PR</div>
+                <div class="timer-controls">
+                    <button class="btn btn-primary" id="btn-start" onclick="startTimer()">Start Hold</button>
+                    <button class="btn btn-secondary" onclick="stopTimer()">Stop</button>
+                    <button class="btn btn-secondary" onclick="resetTimer()">Reset</button>
                 </div>
-                <button class="btn btn-secondary" style="padding: 10px 18px; font-size: 0.75rem;" onclick="generateCO2Table()">Generate</button>
-            </div>
-            <div id="co2-placeholder" class="co2-placeholder">
-                Log a PR of at least 30s to unlock training tables
-            </div>
-            <div id="co2-table-wrap" class="co2-table-wrap" style="display: none;">
-                <table class="co2-table">
-                    <thead>
-                        <tr>
-                            <th>Round</th>
-                            <th>Ventilation (Rest)</th>
-                            <th>Apnea (Hold)</th>
-                        </tr>
-                    </thead>
-                    <tbody id="co2-table-body"></tbody>
-                </table>
-            </div>
-        </section>
+            </section>
 
-        <!-- Arcade -->
-        <section class="glass arcade-section">
-            <div class="section-header">
-                <div>
-                    <div class="section-title" style="color: var(--neon-pink);">Apnea Arcade</div>
-                    <div class="section-subtitle">Dryland challenges</div>
+            <section class="glass breathing-section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">Pre-Dive Breathing</div>
+                        <div class="section-subtitle">Sync with the current</div>
+                    </div>
                 </div>
-                <button class="btn btn-arcade" style="padding: 10px 18px; font-size: 0.75rem;" onclick="generateChallenge()">Draw Card</button>
+                <div class="breathing-visual">
+                    <div class="breath-circle-wrap">
+                        <div class="breath-ring"></div>
+                        <div class="breath-ring-2"></div>
+                        <div class="breath-core" id="breath-core">
+                            <span class="breath-label" id="breath-label">IDLE</span>
+                        </div>
+                    </div>
+                    <div class="breath-info">
+                        <p>Follow the rhythm to lower your heart rate and maximize oxygen saturation before the dive.</p>
+                        <button class="breath-btn" id="breath-btn" onclick="toggleBreathing()">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Start Guide
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass chart-section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">Depth Log</div>
+                        <div class="section-subtitle">Last 10 dives</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </section>
+        </div>
+
+        <!-- TRAINING TAB -->
+        <div class="tab-panel" id="tab-training">
+            <div class="training-header">
+                <h2>🎓 Apnea Academy</h2>
+                <p>Learn breath-hold techniques from beginner to advanced</p>
             </div>
-            <div id="arcade-placeholder" class="co2-placeholder" style="border-color: rgba(255, 0, 127, 0.1);">
-                Draw a challenge to test your limits
+
+            <div class="progress-bar">
+                <div class="progress-fill" id="training-progress" style="width: 0%"></div>
             </div>
-            <div id="arcade-card" style="display: none;"></div>
-        </section>
+            <p style="text-align: center; font-size: 0.75rem; color: rgba(144,224,239,0.4); margin-bottom: 20px;">
+                <span id="progress-text">0 of 12 lessons completed</span>
+            </p>
+
+            <div class="level-selector">
+                <button class="level-btn active" data-level="beginner" onclick="switchLevel('beginner')">
+                    Beginner
+                    <span class="level-tag">0-1:30 PR</span>
+                </button>
+                <button class="level-btn" data-level="intermediate" onclick="switchLevel('intermediate')">
+                    Intermediate
+                    <span class="level-tag">1:30-3:00 PR</span>
+                </button>
+                <button class="level-btn" data-level="advanced" onclick="switchLevel('advanced')">
+                    Advanced
+                    <span class="level-tag">3:00+ PR</span>
+                </button>
+            </div>
+
+            <div id="lessons-container"></div>
+        </div>
+
+        <!-- CO2 TABLES TAB -->
+        <div class="tab-panel" id="tab-tables">
+            <section class="glass co2-section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">CO2 Training Tables</div>
+                        <div class="section-subtitle">Auto-generated from your PR</div>
+                    </div>
+                    <button class="btn btn-secondary" style="padding: 10px 18px; font-size: 0.75rem;" onclick="generateCO2Table()">Generate</button>
+                </div>
+                <div id="co2-placeholder" class="co2-placeholder">
+                    Log a PR of at least 30s to unlock training tables
+                </div>
+                <div id="co2-table-wrap" class="co2-table-wrap" style="display: none;">
+                    <table class="co2-table">
+                        <thead>
+                            <tr>
+                                <th>Round</th>
+                                <th>Ventilation (Rest)</th>
+                                <th>Apnea (Hold)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="co2-table-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ARCADE TAB -->
+        <div class="tab-panel" id="tab-arcade">
+            <section class="glass arcade-section">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title" style="color: var(--neon-pink);">Apnea Arcade</div>
+                        <div class="section-subtitle">Dryland challenges</div>
+                    </div>
+                    <button class="btn btn-arcade" style="padding: 10px 18px; font-size: 0.75rem;" onclick="generateChallenge()">Draw Card</button>
+                </div>
+                <div id="arcade-placeholder" class="co2-placeholder" style="border-color: rgba(255, 0, 127, 0.1);">
+                    Draw a challenge to test your limits
+                </div>
+                <div id="arcade-card" style="display: none;"></div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Lesson Modal -->
+    <div class="lesson-modal" id="lesson-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-back" onclick="closeLesson()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    Back to Lessons
+                </button>
+                <span class="modal-level-badge" id="modal-badge">Beginner</span>
+            </div>
+            <div class="modal-body" id="modal-body"></div>
+            <button class="practice-btn" id="mark-complete-btn" onclick="markLessonComplete()">Mark as Complete</button>
+        </div>
     </div>
 
     <!-- Install Prompt -->
@@ -883,6 +1266,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script>
+
         // ===== STATE =====
         let seconds = 0;
         let timerInterval = null;
@@ -892,6 +1276,304 @@
         let breathTimeout = null;
         let deferredPrompt = null;
         let chartInstance = null;
+        let currentLessonId = null;
+
+        // ===== TRAINING CURRICULUM =====
+        const trainingCurriculum = {
+            beginner: [
+                {
+                    id: 'b1',
+                    title: 'Understanding the Urge to Breathe',
+                    duration: '5 min read',
+                    content: `
+                        <h3>The Science of Breath-Hold</h3>
+                        <p>Contrary to popular belief, the urge to breathe is not triggered by low oxygen — it's triggered by <strong>rising CO2 levels</strong>. Your body constantly produces CO2 as a byproduct of metabolism. When you hold your breath, CO2 accumulates in your bloodstream, and your brain sends signals (contractions) telling you to breathe.</p>
+                        <p>This is actually a <strong>safety margin</strong>. You still have plenty of oxygen when you feel the first contraction. Learning to recognize this signal as "information, not an emergency" is the foundation of all apnea training.</p>
+                        <div class="tip-box">
+                            <div class="tip-title">💡 Key Insight</div>
+                            <p>The "easy phase" of a breath-hold is the period before contractions. The "struggle phase" begins when diaphragm contractions start. Your goal in training is to extend the easy phase and stay calm during the struggle phase.</p>
+                        </div>
+                        <div class="warning-box">
+                            <div class="warning-title">⚠️ Safety First</div>
+                            <p>Never practice breath-holding in water alone. Shallow water blackout can occur without warning. Always train with a buddy who knows rescue procedures.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: 'b2',
+                    title: 'Diaphragmatic Breathing (Belly Breathing)',
+                    duration: '10 min practice',
+                    content: `
+                        <h3>Master the Foundation</h3>
+                        <p>Most people breathe shallowly using only their chest. For apnea, you need to engage the diaphragm — the large muscle beneath your lungs — to maximize air intake and relaxation.</p>
+                        <h3>How to Practice:</h3>
+                        <ul>
+                            <li>Lie on your back with one hand on your chest and one on your belly</li>
+                            <li>Inhale slowly through your nose for 4 seconds — only your belly hand should rise</li>
+                            <li>Exhale slowly for 6-8 seconds through pursed lips or nose</li>
+                            <li>Your chest hand should stay still throughout</li>
+                        </ul>
+                        <p>Practice this for 5 minutes daily. It lowers your heart rate, increases oxygen efficiency, and trains your body to relax on command.</p>
+                        <div class="tip-box">
+                            <div class="tip-title">🎯 Training Goal</div>
+                            <p>Be able to reduce your resting heart rate by 10-15 bpm using only breathing technique before attempting any breath-hold training.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: 'b3',
+                    title: 'The Mammalian Dive Reflex',
+                    duration: '8 min read',
+                    content: `
+                        <h3>Your Built-In Superpower</h3>
+                        <p>When your face contacts cold water, your body automatically triggers the <strong>mammalian dive reflex</strong> — a set of physiological changes that help you hold your breath longer:</p>
+                        <ul>
+                            <li><strong>Bradycardia:</strong> Heart rate slows by 10-25%</li>
+                            <li><strong>Peripheral vasoconstriction:</strong> Blood shifts from limbs to vital organs</li>
+                            <li><strong>Spleen contraction:</strong> Releases extra oxygen-carrying red blood cells</li>
+                        </ul>
+                        <h3>How to Trigger It:</h3>
+                        <ul>
+                            <li>Splash cold water on your face for 30 seconds before a dive</li>
+                            <li>Hold a cold, wet towel to your face during dry training</li>
+                            <li>Submerge your face in a bowl of cold water (10-15°C) for 30 seconds</li>
+                        </ul>
+                        <p>With repeated exposure, this reflex becomes stronger and activates faster — a key adaptation for all freedivers.</p>
+                    `
+                },
+                {
+                    id: 'b4',
+                    title: 'First Static Apnea Attempt',
+                    duration: '15 min practice',
+                    content: `
+                        <h3>Your First Breath-Hold</h3>
+                        <p>Now that you understand the science and can breathe diaphragmatically, it's time for your first controlled static apnea (STA) attempt.</p>
+                        <h3>Preparation Sequence:</h3>
+                        <ul>
+                            <li><strong>Relax:</strong> Lie down comfortably, close your eyes, release tension from jaw, shoulders, hands</li>
+                            <li><strong>Breathe:</strong> 2-3 minutes of slow diaphragmatic breathing (4s in, 6-8s out)</li>
+                            <li><strong>Final breath:</strong> Take a normal, full breath — do NOT over-breathe or hyperventilate</li>
+                            <li><strong>Hold:</strong> Start the timer, stay completely still, focus on relaxation</li>
+                        </ul>
+                        <h3>During the Hold:</h3>
+                        <ul>
+                            <li>When you feel the first contraction, note the time — this is your "contraction threshold"</li>
+                            <li>Try to stay relaxed for 10-15 seconds after the first contraction</li>
+                            <li>Stop immediately if you feel dizzy, tingling, or unusual pressure</li>
+                        </ul>
+                        <div class="tip-box">
+                            <div class="tip-title">🎯 Beginner Target</div>
+                            <p>Aim for 1:00 to 1:30 on your first attempts. Most untrained people can achieve this with proper relaxation. Record your time — this becomes your baseline for all future training.</p>
+                        </div>
+                    `
+                }
+            ],
+            intermediate: [
+                {
+                    id: 'i1',
+                    title: 'CO2 Tolerance Training',
+                    duration: '20 min session',
+                    content: `
+                        <h3>Train Your Body to Tolerate CO2</h3>
+                        <p>CO2 tables are the single most effective training method for extending breath-hold time. They work by repeatedly exposing you to elevated CO2 levels, training your body to delay and reduce the urge-to-breathe response.</p>
+                        <h3>How CO2 Tables Work:</h3>
+                        <p>The hold time <strong>increases</strong> while rest intervals <strong>decrease</strong> across 8 rounds. By the later rounds, you're starting each hold with residual CO2 from the previous round — forcing your body to adapt.</p>
+                        <h3>Sample Table (2:00 max PR):</h3>
+                        <ul>
+                            <li>Round 1: Hold 1:30 — Rest 2:00</li>
+                            <li>Round 2: Hold 1:35 — Rest 1:55</li>
+                            <li>Round 3: Hold 1:40 — Rest 1:50</li>
+                            <li>Round 4: Hold 1:45 — Rest 1:45</li>
+                            <li>Round 5: Hold 1:50 — Rest 1:40</li>
+                            <li>Round 6: Hold 1:55 — Rest 1:35</li>
+                            <li>Round 7: Hold 2:00 — Rest 1:30</li>
+                            <li>Round 8: Hold 2:00 — Rest 1:25</li>
+                        </ul>
+                        <div class="warning-box">
+                            <div class="warning-title">⚠️ Critical Rules</div>
+                            <p>Never hyperventilate between holds — normal breathing only. Hyperventilation strips CO2, defeating the training purpose and increasing blackout risk. Train on dry land with a spotter.</p>
+                        </div>
+                        <p>Do CO2 tables <strong>2-3 times per week</strong>, never on consecutive days. Adaptation happens during rest, not during the session.</p>
+                    `
+                },
+                {
+                    id: 'i2',
+                    title: 'O2 Deprivation Training',
+                    duration: '20 min session',
+                    content: `
+                        <h3>Push Your Low-Oxygen Tolerance</h3>
+                        <p>While CO2 tables train tolerance to the urge to breathe, O2 tables train your body's efficiency at using limited oxygen. This is more advanced and carries higher risk — always use a spotter.</p>
+                        <h3>How O2 Tables Work:</h3>
+                        <p>The hold time <strong>stays constant</strong> (at ~75% of your max) while rest intervals <strong>shrink dramatically</strong>. By the final rounds, you're starting holds with depleted oxygen reserves.</p>
+                        <h3>Sample Table (2:00 max PR, hold at 1:30):</h3>
+                        <ul>
+                            <li>Round 1: Hold 1:30 — Rest 2:30</li>
+                            <li>Round 2: Hold 1:30 — Rest 2:00</li>
+                            <li>Round 3: Hold 1:30 — Rest 1:30</li>
+                            <li>Round 4: Hold 1:30 — Rest 1:00</li>
+                            <li>Round 5: Hold 1:30 — Rest 0:45</li>
+                            <li>Round 6: Hold 1:30 — Rest 0:30</li>
+                        </ul>
+                        <div class="warning-box">
+                            <div class="warning-title">⚠️ High Risk Protocol</div>
+                            <p>O2 tables push you toward hypoxic territory. Never do them in water. Always have a trained buddy present. If you experience tunnel vision, tingling in fingers, or euphoria — stop immediately.</p>
+                        </div>
+                        <p>Alternate CO2 and O2 days. Example week: Mon CO2, Wed O2, Fri CO2.</p>
+                    `
+                },
+                {
+                    id: 'i3',
+                    title: 'Progressive Relaxation & Body Scan',
+                    duration: '15 min practice',
+                    content: `
+                        <h3>The Mental Game</h3>
+                        <p>At intermediate level, physical adaptations have begun — now the bottleneck is mental. The ability to stay calm during contractions separates good freedivers from great ones.</p>
+                        <h3>Progressive Relaxation Technique:</h3>
+                        <ul>
+                            <li>Starting at your toes, consciously tense each muscle group for 5 seconds, then release</li>
+                            <li>Move upward: feet → calves → thighs → hips → stomach → chest → hands → arms → shoulders → neck → face</li>
+                            <li>Spend extra time on the jaw — tension here is the #1 oxygen waster</li>
+                        </ul>
+                        <h3>Body Scan During Holds:</h3>
+                        <p>When contractions hit, mentally "scan" your body for hidden tension. Common culprits:</p>
+                        <ul>
+                            <li>Clenched jaw or tongue pressed to roof of mouth</li>
+                            <li>Tense shoulders creeping toward ears</li>
+                            <li>Fists clenched or fingers spread rigid</li>
+                            <li>Legs stiffened or toes pointed</li>
+                        </ul>
+                        <div class="tip-box">
+                            <div class="tip-title">🧘 Visualization Trick</div>
+                            <p>Imagine yourself as a jellyfish — completely passive, drifting with the current. Or visualize warm water flowing over each body part, carrying tension away. The more vivid the image, the more effective.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: 'i4',
+                    title: 'Breath-Up Technique for Max Attempts',
+                    duration: '12 min practice',
+                    content: `
+                        <h3>The Perfect Pre-Dive Sequence</h3>
+                        <p>When going for a personal best, your preparation sequence matters as much as the hold itself. A proper breath-up maximizes oxygen saturation and triggers the dive reflex.</p>
+                        <h3>The 4-Phase Breath-Up:</h3>
+                        <p><strong>Phase 1 — Purge (2 min):</strong> Fast, active exhales through the mouth. Think "blowing out candles." This clears stale air and begins CO2 offloading.</p>
+                        <p><strong>Phase 2 — Recovery (1 min):</strong> Return to normal, relaxed breathing. Let your heart rate settle.</p>
+                        <p><strong>Phase 3 — Deep Breathing (2 min):</strong> Slow, full diaphragmatic breaths. Inhale for 4s, hold 1s, exhale for 6-8s. Focus on complete lung expansion.</p>
+                        <p><strong>Phase 4 — Final Breath:</strong> One full, calm inhalation to about 80-90% capacity. Do NOT overfill — tension reduces hold time. Pack only if trained by an instructor.</p>
+                        <div class="warning-box">
+                            <div class="warning-title">⚠️ Never Hyperventilate</div>
+                            <p>More than 3-4 deep breaths before a hold is hyperventilation. It dangerously delays the urge to breathe without increasing oxygen stores, creating a blackout risk. Keep breath-ups calm and controlled.</p>
+                        </div>
+                    `
+                }
+            ],
+            advanced: [
+                {
+                    id: 'a1',
+                    title: 'Mouthfill & Frenzel Equalization',
+                    duration: '20 min practice',
+                    content: `
+                        <h3>Equalization for Depth</h3>
+                        <p>As you dive deeper, water pressure compresses your lungs and air spaces. Without equalization, your eardrums can rupture at just 3-4 meters. The Frenzel technique is the gold standard for freedivers.</p>
+                        <h3>Frenzel Technique:</h3>
+                        <ul>
+                            <li>Pinch your nose closed</li>
+                            <li>Place your tongue in the "K" or "NG" position against the soft palate</li>
+                            <li>Use your tongue as a piston to push air into your Eustachian tubes</li>
+                            <li>You should feel a gentle "pop" in your ears</li>
+                        </ul>
+                        <h3>Mouthfill (for depth beyond 30m):</h3>
+                        <p>At depth, lung compression makes it impossible to draw more air. The mouthfill technique involves "locking" a pocket of air in your mouth/oral cavity using your soft palate, then using that air for repeated equalizations as you descend.</p>
+                        <div class="tip-box">
+                            <div class="tip-title">🎯 Dry Practice</div>
+                            <p>Practice Frenzel on land 50 times daily. You should be able to equalize without pinching your nose (by closing your nostrils with your upper lip) before attempting it underwater.</p>
+                        </div>
+                        <div class="warning-box">
+                            <div class="warning-title">⚠️ Depth Warning</div>
+                            <p>Never attempt depth dives without proper equalization training and a certified instructor. Barotrauma (pressure injury) can cause permanent hearing loss.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: 'a2',
+                    title: 'Exhale Dives (Empty Lung Training)',
+                    duration: '15 min session',
+                    content: `
+                        <h3>Training on Empty Lungs</h3>
+                        <p>Exhale dives — starting a dive after a full exhalation — train your body to function with minimal air volume. This triggers an extreme dive reflex and teaches you to stay calm in hypoxic conditions.</p>
+                        <h3>Benefits:</h3>
+                        <ul>
+                            <li>Stronger mammalian dive reflex activation</li>
+                            <li>Better tolerance to lung compression at depth</li>
+                            <li>Improved mental control under extreme hypoxia</li>
+                            <li>Increased spleen contraction response</li>
+                        </ul>
+                        <h3>Protocol:</h3>
+                        <ul>
+                            <li>Exhale completely — force every last bit of air out</li>
+                            <li>Hold on empty lungs for 15-30 seconds (dry land)</li>
+                            <li>Rest 2-3 minutes between attempts</li>
+                            <li>Only 3-5 reps per session</li>
+                        </ul>
+                        <div class="warning-box">
+                            <div class="warning-title">⚠️ Extreme Risk</div>
+                            <p>Empty lung hypoxia comes on FAST. Never do this in water. Always with a spotter. Stop at the first sign of dizziness or vision changes.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: 'a3',
+                    title: 'Negative Pressure Static Apnea (NPSA)',
+                    duration: '15 min session',
+                    content: `
+                        <h3>The Most Advanced Dry Training</h3>
+                        <p>NPSA combines empty lungs with extended breath-holds to simulate the physiological stress of deep diving — without the depth. It's used by competitive freedivers to prepare for dives beyond 50 meters.</p>
+                        <h3>How It Works:</h3>
+                        <p>After a full exhalation, you perform a breath-hold. The negative pressure in your chest triggers maximum dive reflex, rapid bradycardia, and full peripheral vasoconstriction. Your body enters "survival mode" quickly.</p>
+                        <h3>Sample Protocol:</h3>
+                        <ul>
+                            <li>Exhale completely</li>
+                            <li>Hold for 20-45 seconds on empty lungs</li>
+                            <li>Rest 3-5 minutes (full recovery is critical)</li>
+                            <li>3 reps maximum per session</li>
+                        </ul>
+                        <div class="tip-box">
+                            <div class="tip-title">📊 Expected Adaptations</div>
+                            <p>After 4-6 weeks of NPSA training, competitive freedivers typically see: 15-25% increase in max static time, stronger bradycardia response, and significantly delayed contraction onset.</p>
+                        </div>
+                        <div class="warning-box">
+                            <div class="warning-title">⚠️ Expert Only</div>
+                            <p>NPSA should only be attempted after mastering all beginner and intermediate techniques, with a consistent max static of 3:00+. The hypoxic risk is severe. Always supervised.</p>
+                        </div>
+                    `
+                },
+                {
+                    id: 'a4',
+                    title: 'Competition Preparation & Tapering',
+                    duration: '10 min read',
+                    content: `
+                        <h3>Peaking for Performance</h3>
+                        <p>Whether you're competing or attempting a personal depth record, the week before matters as much as the months of training. Proper tapering ensures your body is fully recovered and primed.</p>
+                        <h3>The Taper Week:</h3>
+                        <p><strong>Day -7 to -5:</strong> Reduce training volume by 50%. Maintain intensity but cut reps. Focus on technique, not endurance.</p>
+                        <p><strong>Day -4 to -2:</strong> Light sessions only. Visualization, breathing drills, short easy holds. No tables, no max attempts.</p>
+                        <p><strong>Day -1:</strong> Complete rest. Hydrate heavily (2-3L water). Eat clean carbs. Visualize your dive repeatedly — mental rehearsal improves performance by 10-15%.</p>
+                        <p><strong>Competition Day:</strong> Arrive early. Warm up with light breath-holds (not max). Stay warm — cold muscles consume more oxygen. Trust your training.</p>
+                        <h3>Nutrition for Apnea:</h3>
+                        <ul>
+                            <li><strong>Before training:</strong> Light meal 2-3 hours prior. Avoid heavy digestion which diverts blood from muscles.</li>
+                            <li><strong>Hydration:</strong> Dehydration thickens blood, reducing oxygen transport. Drink water consistently.</li>
+                            <li><strong>Iron:</strong> Consider testing ferritin levels. Low iron = reduced oxygen-carrying capacity.</li>
+                            <li><strong>Caffeine:</strong> Small dose (100mg) 30 min before can improve focus, but increases heart rate — use cautiously.</li>
+                        </ul>
+                        <div class="tip-box">
+                            <div class="tip-title">🏆 Competition Mindset</div>
+                            <p>Elite freedivers describe their best performances as "effortless." The goal is not to fight the water or the urge to breathe — it's to become so relaxed that the hold feels like meditation. The less you "try," the longer you last.</p>
+                        </div>
+                    `
+                }
+            ]
+        };
 
         // ===== INIT =====
         document.addEventListener('DOMContentLoaded', () => {
@@ -901,12 +1583,103 @@
             document.getElementById('pr-display').textContent = formatTime(personalRecord);
             updateSessionStats();
             initChart();
-            initServiceWorker();
+            renderLessons();
+            updateProgress();
         });
 
-        // ===== BACKGROUND EFFECTS =====
+        // ===== TABS =====
+        function switchTab(tabName) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelector(`.nav-tab[data-tab="${tabName}"]`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        // ===== TRAINING MODE =====
+        let currentLevel = 'beginner';
+
+        function switchLevel(level) {
+            currentLevel = level;
+            document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.level-btn[data-level="${level}"]`).classList.add('active');
+            renderLessons();
+        }
+
+        function renderLessons() {
+            const container = document.getElementById('lessons-container');
+            const lessons = trainingCurriculum[currentLevel];
+            const completed = JSON.parse(localStorage.getItem('apneaLessons') || '[]');
+
+            container.innerHTML = lessons.map((lesson, i) => {
+                const isCompleted = completed.includes(lesson.id);
+                return `
+                    <div class="lesson-card ${isCompleted ? 'completed' : ''}" onclick="openLesson('${lesson.id}')">
+                        <div class="lesson-header">
+                            <div class="lesson-number">${i + 1}</div>
+                            <div class="lesson-title">${lesson.title}</div>
+                            <div class="lesson-check">${isCompleted ? '✓' : '○'}</div>
+                        </div>
+                        <div class="lesson-desc">${lesson.duration}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openLesson(lessonId) {
+            currentLessonId = lessonId;
+            const allLessons = [...trainingCurriculum.beginner, ...trainingCurriculum.intermediate, ...trainingCurriculum.advanced];
+            const lesson = allLessons.find(l => l.id === lessonId);
+            if (!lesson) return;
+
+            const modal = document.getElementById('lesson-modal');
+            const badge = document.getElementById('modal-badge');
+            const body = document.getElementById('modal-body');
+            const btn = document.getElementById('mark-complete-btn');
+
+            const levelMap = { 'b': 'beginner', 'i': 'intermediate', 'a': 'advanced' };
+            const level = levelMap[lessonId[0]];
+
+            badge.className = 'modal-level-badge badge-' + level;
+            badge.textContent = level;
+            body.innerHTML = lesson.content;
+
+            const completed = JSON.parse(localStorage.getItem('apneaLessons') || '[]');
+            btn.textContent = completed.includes(lessonId) ? '✓ Completed' : 'Mark as Complete';
+            btn.style.opacity = completed.includes(lessonId) ? '0.6' : '1';
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLesson() {
+            document.getElementById('lesson-modal').classList.remove('active');
+            document.body.style.overflow = '';
+            currentLessonId = null;
+        }
+
+        function markLessonComplete() {
+            if (!currentLessonId) return;
+            const completed = JSON.parse(localStorage.getItem('apneaLessons') || '[]');
+            if (!completed.includes(currentLessonId)) {
+                completed.push(currentLessonId);
+                localStorage.setItem('apneaLessons', JSON.stringify(completed));
+            }
+            document.getElementById('mark-complete-btn').textContent = '✓ Completed';
+            document.getElementById('mark-complete-btn').style.opacity = '0.6';
+            renderLessons();
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const completed = JSON.parse(localStorage.getItem('apneaLessons') || '[]');
+            const total = 12;
+            const pct = Math.round((completed.length / total) * 100);
+            document.getElementById('training-progress').style.width = pct + '%';
+            document.getElementById('progress-text').textContent = `${completed.length} of ${total} lessons completed`;
+        }
+
+        // ===== BACKGROUND =====
         function initBackgroundEffects() {
-            // Particles
             const particleContainer = document.getElementById('particles');
             for (let i = 0; i < 30; i++) {
                 const p = document.createElement('div');
@@ -919,7 +1692,6 @@
                 particleContainer.appendChild(p);
             }
 
-            // Bubbles
             const bubbleContainer = document.getElementById('bubbles');
             for (let i = 0; i < 15; i++) {
                 const b = document.createElement('div');
@@ -951,7 +1723,6 @@
         // ===== TIMER =====
         function startTimer() {
             if (timerInterval) return;
-
             const display = document.getElementById('timer-display');
             const status = document.getElementById('timer-status');
             const btnStart = document.getElementById('btn-start');
@@ -989,7 +1760,6 @@
             status.classList.add('success');
             btnStart.textContent = 'Start Hold';
             btnStart.classList.remove('opacity-60');
-            document.body.classList.remove('animate-shake');
 
             const finalTime = Math.floor(seconds);
             if (finalTime > personalRecord) {
@@ -1000,7 +1770,6 @@
                 status.style.color = 'var(--neon-green)';
                 triggerConfetti();
             }
-
             addToHistory(finalTime);
         }
 
@@ -1024,7 +1793,6 @@
         function checkDepthZones() {
             const status = document.getElementById('timer-status');
             const display = document.getElementById('timer-display');
-
             if (personalRecord > 0) {
                 const ratio = seconds / personalRecord;
                 if (ratio > 0.85) {
@@ -1057,11 +1825,9 @@
         // ===== CHART =====
         function initChart() {
             const ctx = document.getElementById('progressChart').getContext('2d');
-            const data = getChartData();
-
             chartInstance = new Chart(ctx, {
                 type: 'line',
-                data: data,
+                data: getChartData(),
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
@@ -1155,17 +1921,14 @@
                 if (!isBreathing) return;
                 label.textContent = 'INHALE';
                 core.className = 'breath-core inhale';
-
                 breathTimeout = setTimeout(() => {
                     if (!isBreathing) return;
                     label.textContent = 'HOLD';
                     core.className = 'breath-core hold';
-
                     breathTimeout = setTimeout(() => {
                         if (!isBreathing) return;
                         label.textContent = 'EXHALE';
                         core.className = 'breath-core exhale';
-
                         breathTimeout = setTimeout(() => {
                             if (!isBreathing) return;
                             cycle();
@@ -1194,8 +1957,7 @@
 
         function setReadiness(score) {
             localStorage.setItem('apneaReadiness', JSON.stringify({ score, date: new Date().toDateString() }));
-            const pills = document.querySelectorAll('.pill');
-            pills.forEach((p, i) => {
+            document.querySelectorAll('.pill').forEach((p, i) => {
                 p.className = 'pill' + (i + 1 === score ? ' active-' + score : '');
             });
         }
@@ -1206,13 +1968,10 @@
                 alert('Log a PR of at least 30 seconds first.');
                 return;
             }
-
             document.getElementById('co2-placeholder').style.display = 'none';
             document.getElementById('co2-table-wrap').style.display = 'block';
-
             const tbody = document.getElementById('co2-table-body');
             tbody.innerHTML = '';
-
             const holdTime = Math.floor(personalRecord * 0.5);
             let initialRest = 120;
             const decayRate = 0.15;
@@ -1243,14 +2002,10 @@
             const card = document.getElementById('arcade-card');
             const placeholder = document.getElementById('arcade-placeholder');
             const c = challenges[Math.floor(Math.random() * challenges.length)];
-
             placeholder.style.display = 'none';
             card.style.display = 'block';
             card.className = 'arcade-card';
-
-            // Trigger reflow for animation
             void card.offsetWidth;
-
             card.innerHTML = `
                 <div class="arcade-tag">Dryland Challenge</div>
                 <div class="arcade-title">${c.title}</div>
@@ -1268,13 +2023,11 @@
                 el.style.left = '50%';
                 el.style.top = '40%';
                 document.body.appendChild(el);
-
                 const angle = Math.random() * Math.PI * 2;
                 const velocity = 5 + Math.random() * 15;
                 const tx = Math.cos(angle) * velocity * 15;
                 const ty = Math.sin(angle) * velocity * 15;
                 const rot = Math.random() * 720;
-
                 el.animate([
                     { transform: 'translate(0,0) rotate(0deg) scale(1)', opacity: 1 },
                     { transform: `translate(${tx}px, ${ty}px) rotate(${rot}deg) scale(0)`, opacity: 0 }
@@ -1285,11 +2038,10 @@
         // ===== PWA =====
         function initServiceWorker() {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('sw.js')
+                navigator.serviceWorker.register('./sw.js', { scope: './' })
                     .then(reg => console.log('SW registered'))
                     .catch(err => console.log('SW error', err));
             }
-
             window.addEventListener('beforeinstallprompt', (e) => {
                 e.preventDefault();
                 deferredPrompt = e;
@@ -1312,6 +2064,8 @@
         function dismissInstall() {
             document.getElementById('install-prompt').classList.remove('show');
         }
+
+        initServiceWorker();
     </script>
 </body>
 </html>

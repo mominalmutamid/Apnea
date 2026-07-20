@@ -1,20 +1,22 @@
-const CACHE_NAME = 'apnea-cc-v1';
+const CACHE_NAME = 'apnea-cc-v2';
+
+// Get the base path dynamically so it works on any domain/subfolder
+const BASE = self.location.pathname.replace(/sw\.js$/, '') || './';
+
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/sw.js',
-  '/favicon.ico',
-  '/apple-touch-icon.png',
-  '/icon-32x32.png',
-  '/icon-72x72.png',
-  '/icon-96x96.png',
-  '/icon-128x128.png',
-  '/icon-144x144.png',
-  '/icon-152x152.png',
-  '/icon-192x192.png',
-  '/icon-384x384.png',
-  '/icon-512x512.png'
+  BASE + 'index.html',
+  BASE + 'manifest.json',
+  BASE + 'favicon.ico',
+  BASE + 'apple-touch-icon.png',
+  BASE + 'icon-32x32.png',
+  BASE + 'icon-72x72.png',
+  BASE + 'icon-96x96.png',
+  BASE + 'icon-128x128.png',
+  BASE + 'icon-144x144.png',
+  BASE + 'icon-152x152.png',
+  BASE + 'icon-192x192.png',
+  BASE + 'icon-384x384.png',
+  BASE + 'icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -40,11 +42,15 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   if (request.method !== 'GET') return;
-  if (!request.url.startsWith(self.location.origin)) return;
+
+  // Only handle same-origin requests
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
 
   event.respondWith(
     caches.match(request).then((cached) => {
       if (cached) {
+        // Background update
         fetch(request).then((response) => {
           if (response && response.status === 200) {
             caches.open(CACHE_NAME).then((cache) => cache.put(request, response));
@@ -52,6 +58,7 @@ self.addEventListener('fetch', (event) => {
         }).catch(() => {});
         return cached;
       }
+
       return fetch(request).then((response) => {
         if (!response || response.status !== 200 || response.type !== 'basic') {
           return response;
@@ -61,8 +68,9 @@ self.addEventListener('fetch', (event) => {
         return response;
       });
     }).catch(() => {
-      if (request.headers.get('accept').includes('text/html')) {
-        return caches.match('/index.html');
+      // Offline fallback for HTML
+      if (request.headers.get('accept')?.includes('text/html')) {
+        return caches.match(BASE + 'index.html');
       }
     })
   );
